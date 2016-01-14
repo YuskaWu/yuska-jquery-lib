@@ -1,0 +1,54 @@
+<script type="text/x-custom-template">
+    var content = $('#content');
+    var sendBtn = content.find('button[name=send]');
+    
+    var ajax = new JsonAjax({
+        overlayTargetElms: content,
+        
+        before: function () {
+            var btn = sendBtn.button('loading');
+            this.sendBtn = btn;
+        },
+        
+        done: function (data, textStatus, jqXHR) {
+            //content.find('p[name=response]').jsonViewer(data);
+        },
+        
+        fail: function (jqXHR, textStatus, errorThrown) {
+            var json = $.parseJSON(jqXHR.responseText);
+            content.find('div[name=response]').jsonViewer(json);
+        },
+        
+        after: function () {
+            this.sendBtn.button('reset');
+        }
+    });
+
+
+    sendBtn.click(function(){ 
+        var url = $('#jsonAjax input:first').val();
+        ajax.send('http://graph.facebook.com/me/');
+    });
+</script>
+
+<!-- ============================================================= -->
+
+<div class="input-group">
+    <span class="input-group-btn">
+        <button 
+                autocomplete="off" 
+                data-loading-text="Loading..." 
+                class="btn btn-primary" type="button" name="send">GO!</button>
+    </span>
+    <input type="text" class="form-control" placeholder="URL" value="http://graph.facebook.com/me/">
+</div><!-- /input-group -->
+
+<br />
+
+<div class="panel panel-default">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Result</div>
+    <div name="response" class="panel-body" >
+
+    </div>
+</div>

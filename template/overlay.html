@@ -1,0 +1,24 @@
+<script type="text/x-custom-template">
+    var content = $('#content');
+    var overlay = new LoadingOverlay(content.find('pre'));
+    
+    content.find('button[name=show]').click(function(){
+        overlay.show();
+    });
+    
+    content.find('button[name=remove]').click(function(){
+        overlay.remove();
+    });
+</script>
+
+<!-- ============================================================= -->
+
+<br />
+<div class="btn-group" role="group" >
+    <button class="btn btn-primary" type="button" name="show">show</button>
+    <button class="btn btn-primary" type="button" name="remove">remove</button>
+</div>
+<br /><br />
+<pre>                    
+Using props and state, we can put together a small Todo application. This example uses state to track the current list of items as well as the text that the user has entered. Although event handlers appear to be rendered inline, they will be collected and implemented using event delegation.
+</pre>

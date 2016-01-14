@@ -1,0 +1,120 @@
+<script type="text/x-custom-template">
+    var content = $('#pagination');
+    var staticTable = content.find('table[name=static]');
+    var dynamicTable = content.find('table[name=dynamic]');
+    
+    var staticList = [
+        {author: 'Kasyu 1', comment: 'comment 1'},
+        {author: 'Kasyu 2', comment: 'comment 2'},
+        {author: 'Kasyu 3', comment: 'comment 3'},
+        {author: 'Kasyu 4', comment: 'comment 4'},
+        {author: 'Kasyu 5', comment: 'comment 5'},
+        {author: 'Kasyu 6', comment: 'comment 6'},
+        {author: 'Kasyu 7', comment: 'comment 7'},
+        {author: 'Kasyu 8', comment: 'comment 8'},
+        {author: 'Kasyu 9', comment: 'comment 9'},
+        {author: 'Kasyu 10', comment: 'comment 10'}
+    ];
+    
+    // static
+    var pagination = new Pagination({
+        listContainer: staticTable.find('tbody'),
+        paginationContainer: content.find('div[name=staticPaging]'),
+        pageSize: 3,
+        defaultPage: 2,
+        visibleSize: 2,
+
+        rowRender: function (itemData) {
+            var html = '<tr><td>' + itemData.author + '</td><td>' + itemData.comment + '</td></tr>';
+            return html;
+        }
+    });
+    
+    // dynamic
+    var ajaxPagination = new AjaxPagination({
+        listContainer: dynamicTable.find('tbody'),
+        paginationContainer: content.find('div[name=dynamicPaging]'),
+        pageSize: 3,
+        defaultPage: 2,
+        visibleSize: 4,
+        url: 'data/list.json',
+        type: 'GET',
+
+        getResponseDataList: function(json){
+            var data = [];
+            var num = this.requestPageNum;
+            var size = this.getPageSize();
+            var sIndex = size*(num-1);
+            var eIndex = sIndex + size;
+            if (eIndex > json.data.length) {
+                eIndex = json.data.length;
+            }
+            for (var i = sIndex; i < eIndex; i++) {
+                data.push(json.data[i]);
+            }
+
+            return data;
+        },
+
+        getResponseTotalCount: function(json){
+            return (this.totalCount = json.data.length);
+        },
+
+        afterDone: function () {
+            console.log('render finished.');
+        },
+
+        rowRender: function (itemData) {
+            var html = '<tr><td>' + itemData.author + '</td><td>' + itemData.comment + '</td></tr>';
+            return html;
+        }
+    });
+    
+    
+    content.find('button[name=static]').click(function(){
+        pagination.paging(staticList);
+    });
+    
+    content.find('button[name=dynamic]').click(function(){
+        ajaxPagination.paging();
+    });
+</script>
+    
+<!-- ============================================================= -->
+
+<div role="tabpanel" class="tab-pane fade in" id="pagination">
+    <br />
+    <div class="btn-group" role="group" >
+        <button autocomplete="off" data-loading-text="Loading..." 
+                class="btn btn-primary" type="button" name="static">static</button>
+        <button autocomplete="off" data-loading-text="Loading..." 
+                class="btn btn-primary" type="button" name="dynamic">dynamic</button>
+    </div>
+    <br /><br />
+    <!-- Table -->
+    <table class="table" name="static">
+        <caption>Static Pagination</caption>
+        <thead>
+            <tr>
+                <th>Author</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div name="staticPaging"></div>
+    <br />
+
+    <!-- Table -->
+    <table class="table" name="dynamic">
+        <caption>Dynamic Pagination</caption>
+        <thead>
+            <tr>
+                <th>Author</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div name="dynamicPaging"></div>
+</div>
