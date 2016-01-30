@@ -1,39 +1,47 @@
-function LoadingOverlay (overlay, opt) {
-	var thisIns = this;
-	var defOption = {
+var LoadingOverlay = ( function(window) {
+
+    var defOption = {
 		overlayClass: "ajaxLoading",
 		resizeFrequency: 500
 	};
+    
+    function LoadingOverlay (overlay, opt) {
+        var thisIns = this;
 
-	var option = $.extend(defOption, opt);
-	this.option = option;
-	this.overlayElms = [];
-	
-	if ($.isArray(overlay)) {
-		this.overlayTargetElms = overlay;
-	} else {
-		this.overlayTargetElms = [];
-		this.overlayTargetElms.push(overlay);
-	}
-	
-	
-	/**
-	 * Bind window resize event. When resize event occur, trigger updateLoadingOverlayPosition() function 
-	 * to modify the size and position of overlay element, so that overlay element can display appropriately 
-	 * over the element which we want to overlay.
-	 */
-	$(window).on('resizeEnd', function () {
-		thisIns.updateLoadingOverlayPosition();
-	});
-	$(window).resize(function() {
-		if(thisIns.resizeTO) {
-			clearTimeout(this.resizeTO);
-		}
-		thisIns.resizeTO = setTimeout(function() {
-			$(this).trigger('resizeEnd');
-		}, option.resizeFrequency);
-	});
-}
+
+        var option = $.extend(defOption, opt);
+        this.option = option;
+        this.overlayElms = [];
+
+        if ($.isArray(overlay)) {
+            this.overlayTargetElms = overlay;
+        } else {
+            this.overlayTargetElms = [];
+            this.overlayTargetElms.push(overlay);
+        }
+
+
+        /**
+         * Bind window resize event. When resize event occur, trigger updateLoadingOverlayPosition() function 
+         * to modify the size and position of overlay element, so that overlay element can display appropriately 
+         * over the element which we want to overlay.
+         */
+        $(window).on('resizeEnd', function () {
+            thisIns.updateLoadingOverlayPosition();
+        });
+        $(window).resize(function() {
+            if(thisIns.resizeTO) {
+                clearTimeout(this.resizeTO);
+            }
+            thisIns.resizeTO = setTimeout(function() {
+                $(this).trigger('resizeEnd');
+            }, option.resizeFrequency);
+        });
+    }
+    
+    return LoadingOverlay;
+    
+} )(window);
 
 LoadingOverlay.prototype.show = function () {
 	var thisIns = this;
