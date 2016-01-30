@@ -1,67 +1,60 @@
- /**
-  * Send ajax request and receive json data.
-  */
-var JsonAjax = ( function(window) {
-
-    // default options
-    var defOption = {
+/**
+ * Send ajax request and receive json data.
+ */
+function JsonAjax (opt) {
+	// default options
+	var defOption = {
         type: 'POST',
-        async: true,
-        timeout: 120000,
-        overlayClass: "ajaxLoading",
-        overlayTargetElms: [],
-
-        /**
-         * callback function, trigger before sending request.
-         */
-        before: function(){},
-        /**
-         * callback function, trigger after request has finished. 
-         */
-        after: function(){},
-        /**
-         * A function to be called if the request succeeds.
-         */
-        done: function (data, textStatus, jqXHR) {},
-        /**
-         * A function to be called if the request fails.
-         * The second argument (besides null) are "timeout", 
-         * "error", "abort", and "parsererror".
-         */
-        fail: function (jqXHR, textStatus, errorThrown) {
-            try {
-                console.log(jqXHR);
-            } catch (err) {
-
-            }
-
-            // For FireFox & IE. 
-            // If user aborted ajax, FireFox and IE will trigger this fail function, following
-            // judgment is used to ignore the situation. 
-            if (this.isUserAborted(jqXHR) && textStatus != 'timeout' && textStatus != 'parsererror') {
-                return;
-            }
-
+		async: true,
+		timeout: 120000,
+		overlayClass: "ajaxLoading",
+		overlayTargetElms: [],
+		
+		/**
+		 * callback function, trigger before sending request.
+		 */
+		before: function(){},
+		/**
+		 * callback function, trigger after request has finished. 
+		 */
+		after: function(){},
+		/**
+	     * A function to be called if the request succeeds.
+	     */
+	    done: function (data, textStatus, jqXHR) {},
+	    /**
+	     * A function to be called if the request fails.
+	     * The second argument (besides null) are "timeout", 
+	     * "error", "abort", and "parsererror".
+	     */
+	    fail: function (jqXHR, textStatus, errorThrown) {
+	    	try {
+	    		console.log(jqXHR);
+			} catch (err) {
+				
+			}
+			
+			// For FireFox & IE. 
+			// If user aborted ajax, FireFox and IE will trigger this fail function, following
+			// judgment is used to ignore the situation. 
+			if (this.isUserAborted(jqXHR) && textStatus != 'timeout' && textStatus != 'parsererror') {
+				return;
+			}
+			
             alert('error:' + jqXHR.responseText);
+		}
+	};
+    
+    this.option = $.extend(defOption, opt);
+    this.overlay = new LoadingOverlay(
+        this.option.overlayTargetElms, 
+        {
+            overlayClass: this.option.overlayClass
         }
-    };
+    );
 
-    function JsonAjax (opt) {
-        this.option = $.extend(defOption, opt);
-        this.overlay = new LoadingOverlay(
-            this.option.overlayTargetElms, 
-            {
-                overlayClass: this.option.overlayClass
-            }
-        );
-
-        this.complete = true;
-    }
-
-    return JsonAjax;
-
-} )(window);
-
+    this.complete = true;
+}
 
 // public functions -----------------------------------------------------------------------
 

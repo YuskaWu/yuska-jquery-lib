@@ -1,66 +1,59 @@
 /**
  * Static pagination
  */
-var Pagination = ( function(window) {
-    
-    // default option
-    var defOption = {
-        // [require] jquery object, the container element for list.
-        listContainer: null,
-        // [require] jquery object, the container element for all elements of pagination.
-        paginationContainer: null,
-        // container html for all paginaton buttons.
-        btnContainerHtml: '<nav style="text-align:center;width:100%"><ul class="pagination"></ul></nav>',
+function Pagination (opt) {
+	// default option
+	var defOption = {
+		// [require] jquery object, the container element for list.
+		listContainer: null,
+		// [require] jquery object, the container element for all elements of pagination.
+		paginationContainer: null,
+		// container html for all paginaton buttons.
+		btnContainerHtml: '<nav style="text-align:center;width:100%"><ul class="pagination"></ul></nav>',
+		
+		// first page button
+		firstBtnHtml: '<li><a href="#" aria-label="First"><span aria-hidden="true">&lt;&lt;</span></a></li>',
+		// last page button
+		lastBtnHtml: '<li><a href="#" aria-label="Last"><span aria-hidden="true">&gt;&gt;</span></a></l&lt;i>',
+		// previous page button
+		preBtnHtml: '<li><a href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>',
+		// next page button
+		nextBtnHtml: '<li><a href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>',
+		// page number button
+		pageBtnHtml: '<li><a href="#">{pageNum}</a></li>',
 
-        // first page button
-        firstBtnHtml: '<li><a href="#" aria-label="First"><span aria-hidden="true">&lt;&lt;</span></a></li>',
-        // last page button
-        lastBtnHtml: '<li><a href="#" aria-label="Last"><span aria-hidden="true">&gt;&gt;</span></a></l&lt;i>',
-        // previous page button
-        preBtnHtml: '<li><a href="#" aria-label="Previous"><span aria-hidden="true">&lt;</span></a></li>',
-        // next page button
-        nextBtnHtml: '<li><a href="#" aria-label="Next"><span aria-hidden="true">&gt;</span></a></li>',
-        // page number button
-        pageBtnHtml: '<li><a href="#">{pageNum}</a></li>',
-
-        // record number for each page
-        pageSize: 5,
+		// record number for each page
+		pageSize: 5,
         // how many number buttons to be shown at the same time.
         visibleSize: 3,
+		
+		// default page
+		defaultPage: 1,
 
-        // default page
-        defaultPage: 1,
+		// callback function to apply active style for page number button.
+		applyActiveStyle: function (pageBtnElm) {
+			pageBtnElm.addClass('active');
+		},
+		// callback function to remove active style for page number button.
+		removeActiveStyle: function (pageBtnElm) {
+			pageBtnElm.removeClass('active');
+		},
+		
+		// callback function to render list.
+		rowRender: function (itemData) {}	
+	};
 
-        // callback function to apply active style for page number button.
-        applyActiveStyle: function (pageBtnElm) {
-            pageBtnElm.addClass('active');
-        },
-        // callback function to remove active style for page number button.
-        removeActiveStyle: function (pageBtnElm) {
-            pageBtnElm.removeClass('active');
-        },
-
-        // callback function to render list.
-        rowRender: function (itemData) {}	
-    };
+	this.option = $.extend(defOption, opt);
+	this.currentPage = 0;
+	this.totalPage = 0;
     
-    function Pagination (opt) {
-        this.option = $.extend({}, defOption, opt);
-        this.currentPage = 0;
-        this.totalPage = 0;
-
-        if (this.option.visibleSize < 1) {
-            this.option.visibleSize = 3;
-        }
-
-        this.currentPageBtn = null;
-        this.pageBtns = [];
+    if (this.option.visibleSize < 1) {
+        this.option.visibleSize = 3;
     }
-    
-    return Pagination;
-    
-} )(window);
-
+	
+	this.currentPageBtn = null;
+	this.pageBtns = [];
+}
 
 /**
 * render pagination buttons.
@@ -317,55 +310,48 @@ Pagination.prototype.refresh = function () {
  * Dynamic ajax pagination.
  * Need QueryInfo object in Server side to bind paging info.
  */
-var AjaxPagination = ( function(parentModule) {
-
+function AjaxPagination (opt) {
     // default option (inherit Pagination)
-    var defOption = {
-        // ajax url
-        url: '',
+	var defOption = {
+		// ajax url
+		url: '',
         // request method
         type: 'POST',
-        // parameters for ajax request
-        params: {},
-        // the elements to be overlaied.
-        overlayTargetElms: [],
-
-        // parameter name for page size and page number.
-        paraNamePageSize: 'pagingInfo.pageSize',
-        paraNamePageNum: 'pagingInfo.page',
-
-        // [require] Write your logic here to get data list from response json object.
+		// parameters for ajax request
+		params: {},
+		// the elements to be overlaied.
+		overlayTargetElms: [],
+		
+		// parameter name for page size and page number.
+		paraNamePageSize: 'pagingInfo.pageSize',
+		paraNamePageNum: 'pagingInfo.page',
+		
+		// [require] Write your logic here to get data list from response json object.
         getResponseDataList: function(json){
             return json.data;
         },
-
-        // [require] Write your logic here to get total count from response json object.
+        
+		// [require] Write your logic here to get total count from response json object.
         getResponseTotalCount: function(json){
             return json.pagingInfo.totalCount;
         },
-
+        
         // callback function, triggered after rendering list has finished.
-        afterDone: function(){}
-    };
+		afterDone: function(){}
+	};
+	var option = $.extend(defOption, opt);
+	// inherit Pagination
+	Pagination.call(this, option);
     
-    function AjaxPagination (opt) {
-        var option = $.extend({}, defOption, opt);
-        // inherit Pagination
-        parentModule.call(this, option);
-
-        var thisIns = this;
-        this.ajax = new JsonAjax({
-            type: this.option.type,
-            overlayTargetElms: this.option.overlayTargetElms,
-            done: function (data) {
-                thisIns.onAjaxResponse(data);
-            }
-        });
-    }
-    
-    return AjaxPagination;
-    
-} )(Pagination);
+    var thisIns = this;
+	this.ajax = new JsonAjax({
+        type: this.option.type,
+		overlayTargetElms: this.option.overlayTargetElms,
+		done: function (data) {
+			thisIns.onAjaxResponse(data);
+		}
+	});
+}
 
 // inherit prototype methods.
 // The Object.create() method creates a new object with the specified prototype object and properties.
